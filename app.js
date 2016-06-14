@@ -2,13 +2,37 @@ var express = require('express');
 var app = express();
 var fs = require('fs');
 
+var mongojs = require('mongojs');
+
 var bodyParser = require('body-parser');
+
+// connect using SCRAM-SHA-1 mechanism
+var db = mongojs('richard2:hahahaha@ds011664.mlab.com:11664/hackyourfuture?authMechanism=SCRAM-SHA-1', ['players']);
 
 app.use(bodyParser.json());
 
-app.get('/', function(req, res) {
-    console.log(req.query);
-    res.send('Hello ' + req.param('name', 'world'));
+// Link the frontend dir to the server
+app.use(express.static('frontend'));
+
+app.get('/data/news.json', function(req, res) {
+    db.articles.find( function(err, articles) {
+        res.json( articles );
+    });
+});
+
+app.get('/data/categories.json', function(req, res) {
+    db.categories.find( function(err, categories) {
+        res.json( categories );
+    });
+});
+
+app.get('/players.json', function(req, res) {
+    db.players.find( function(err, players) {
+
+        console.log('Players: ', players);
+
+        res.send( JSON.stringify(players) );
+    });
 });
 
 // Store ALL the todos
@@ -21,8 +45,9 @@ app.post('/todos.json', function(req, res) {
 
     console.log('HELLO A');
 
-    // write that string to todos.json
-    fs.writeFile('todos.json', jsonBody, function(err) {
+    var todos = req.body;
+
+    db.todos.insert(todos, function(err) {
         console.log('HELLO B');
         if (err) {
             res.send(JSON.stringify({
@@ -50,29 +75,69 @@ app.get('/todos.json', function(req, res) {
 
 // Saving a SINGLE todo
 app.put('/todos.json', function(req, res) {
-    var todo = req.body;
-    console.log(req.body);
+    console.log('req.body: ', req.body);
+    console.log('Hi');
 
-    // read todos
-    fs.readFile('todos.json', 'utf8', function(err, todosJson) {
-        // Convert todos.json to an object
-        var todos = JSON.parse(todosJson);
+    var newTodo = req.body;
 
-        // push todo to todos array
-        todos.push(todo);
+    // read todos.json
+    fs.readFile('todos.json', 'utf8', function(err, data){
 
-        // Convert todos back to JSON string
+        // convert todos.json string to an object
+        var todos = JSON.parse(data);
+
+        // push new todo into that object
+        todos.push(newTodo);
+
+        // convert it again to a string
         var todosJson = JSON.stringify(todos);
 
-        // write todos to todos.json
-        fs.writeFile('todos.json', todosJson, function() {
+        // write the file back to todos.json
+        fs.writeFile('todos.json', todosJson, 'utf8', function(err) {
 
-            // Send back the changed todos to the user
-            res.send(todos);
+            // Done writing the file
+            console.log('done writing the file');
+            res.send(todosJson);
         });
     });
 });
 
-app.listen(3000, function() {
+// Deleting a SINGLE todo
+app.delete('/todos.json', function(req, res) {
+    console.log('req.body: ', req.body);
+    console.log('Hi');
+
+    var deleteTodo = req.body;
+
+    // read todos.json
+    fs.readFile('todos.json', 'utf8', function(err, data){
+
+        // convert todos.json string to an object
+        var todos = JSON.parse(data);
+
+        // Todo should be removed here
+        var newTodos = [];
+        for(var i =0; i < todos.length; i++) {
+            var todo = todos[i];
+            if(todo.text !== deleteTodo.text) {
+                newTodos.push(todo);
+            }
+        }
+
+        // convert it again to a string
+        var todosJson = JSON.stringify(newTodos);
+
+        // write the file back to todos.json
+        fs.writeFile('todos.json', todosJson, 'utf8', function(err) {
+
+            // Done writing the file
+            console.log('done writing the file');
+            res.send(todosJson);
+        });
+    });
+});
+
+
+app.listen(3002, function() {
     console.log('Example app listening on port 3000!');
 });
