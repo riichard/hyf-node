@@ -18,9 +18,9 @@ app.use(express.static('static'));
 
 app.get('/data/news.json', function(req, res) {
     db.articles.find(
-        { category_id: { $in: [1, 2 ] } },
+        {  },
         function(err, articles) {
-        res.json( articles.slice(0,2) );
+        res.json( articles );
     });
 });
 
