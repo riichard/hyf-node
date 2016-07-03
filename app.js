@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
 var fs = require('fs');
+var async = require('async');
 
 var mongojs = require('mongojs');
 
@@ -15,8 +16,10 @@ app.use(bodyParser.json());
 app.use(express.static('frontend'));
 
 app.get('/data/news.json', function(req, res) {
-    db.articles.find( function(err, articles) {
-        res.json( articles );
+    db.articles.find(
+        { category_id: { $in: [1, 2 ] } },
+        function(err, articles) {
+        res.json( articles.slice(0,2) );
     });
 });
 
@@ -137,7 +140,46 @@ app.delete('/todos.json', function(req, res) {
     });
 });
 
+app.get('/profile.json', function(req, res) {
 
-app.listen(3002, function() {
-    console.log('Example app listening on port 3000!');
+    var username = 'richard';
+
+    async.parallel({
+        // Get the about information from the database
+        about: function(done) {
+            db.about.find({ name: username }, done);
+        },
+
+        // Get the posts from the database
+        posts: function(done) {
+            db.posts.find({ name: username }, done);
+        },
+
+        // Get the friends from the database
+        friends: function(done) {
+            db.friends.find({ name: username }, done);
+        },
+
+        // Get the photos from the database
+        photos: function(done) {
+            db.photos.find({ name: username }, done);
+        },
+
+        food: function(done) {
+            done( 'its ramadan');
+        }
+    },
+
+    function(err, data) {
+        console.log('error: ', err);
+        console.log('data: ', data);
+        // Send back the response to the browser
+        res.json(data);
+    });
+});
+
+
+var port = 3004;
+app.listen(port, function() {
+    console.log('Example app listening on port '+port);
 });
