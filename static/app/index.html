@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    
+    <title>HackYourFuture</title>
+    <script src="/bower_components/angular/angular.js"></script>
+    <script src="/bower_components/angular-filter/dist/angular-filter.js"></script>
+    <script src="/bower_components/angular-route/angular-route.js"></script>
+    <script src="/bower_components/angular-resource/angular-resource.js"></script>
+    <script src="/app/src/js/controller.js"></script>
+    <script src="/app/src/js/services.js"></script>
+    <script src="/app/src/js/factories.js"></script>
+    <script src="/app/src/js/filters.js"></script>
+    <script src="/app/src/js/routes.js"></script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body ng-app="hyfNews">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <div ng-controller="myCtrl as newMyCtrl">
+
+                    <ul class="nav nav-tabs">
+                        <li><a href="#/">Home</a>
+                        <li ng-repeat="(categoryId, category) in
+                            newMyCtrl.categories">
+                            <a ng-href="#/category/{{
+                                category.cat_id }}">
+                                {{category.cat_name }}
+                            </a>
+                        </li>
+                    </ul>
+
+                    <hr /> 
+
+                    <div ng-view></div>
+                </div>
+            </div>
+        </div>
+    </div>
+   
+</body>
+</html>

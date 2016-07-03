@@ -1,0 +1,25 @@
+{
+  "name": "hyf-angular-newsapp",
+  "authors": [
+    "Richard Kraaijenhagen <stdin+git@riichard.com>"
+  ],
+  "description": "An example app for Hack your Future",
+  "main": "app/index.html",
+  "moduleType": [],
+  "license": "MIT",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-filter": "~0.5.8",
+    "angular": "~1.5.5",
+    "angular-route": "~1.5.5",
+    "angular-resource": "~1.5.5"
+  }
+}

@@ -14,6 +14,7 @@ app.use(bodyParser.json());
 
 // Link the frontend dir to the server
 app.use(express.static('frontend'));
+app.use(express.static('static'));
 
 app.get('/data/news.json', function(req, res) {
     db.articles.find(
